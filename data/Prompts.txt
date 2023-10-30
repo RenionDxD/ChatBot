@@ -1,0 +1,4 @@
+usuarios=reformula respuesta para entendimiento de usuarios(25 palabras min, max 50)(redaccion futura)(no datos)(solo respuesta):
+soporte=Reformula respuesta siguiente (25 palabras min, max 50) de manera que dirija al usuario a contactos de servicios para pedir (redaccion futura)(no datos)(solo respuesta):
+codigo=Reformula respuesta siguiente (25 palabras min, max 50) de manera que dirija al usuario a contactos de servicios ya que hubo error de codigo (redaccion futura)(no datos)(solo respuesta): 
+error=Decir que hubo un problema en el sistema (no decir nada mas)
