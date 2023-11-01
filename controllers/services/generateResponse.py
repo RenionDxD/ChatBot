@@ -8,13 +8,13 @@ def core_gpt(text_solucion,redireccion,pregunta):
     context = search_context(redireccion)
     solucion = "["+text_solucion+"]"
     prompt = context + solucion+" : "+context_pregunta
-    openai.api_key = "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"
+    #openai.api_key = "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"
     #reformula para entendimiento de usuario
-    completion = openai.Completion.create(engine="text-davinci-003",
-                         prompt=prompt,
-                         max_tokens=2048 )
-    response = completion.choices[0].text
-    return response
+    #completion = openai.Completion.create(engine="text-davinci-003",
+    #                     prompt=prompt,
+    #                    max_tokens=2048 )
+    #response = completion.choices[0].text
+    return prompt#response
 
 
 
