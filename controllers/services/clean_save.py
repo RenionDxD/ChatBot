@@ -7,8 +7,10 @@ from unidecode import unidecode
 import unicodedata
 # instalar pip install openpyxl
 # pip install unidecode
+# pip install openpyxl
 
-
+nltk.download('stopwords')
+nltk.download('punkt')
 
 
 def limpiar_texto(text):
@@ -32,9 +34,9 @@ def guardar_limpiar():
         data['comentario'] = data['comentario'].apply(limpiar_texto)
         data['solucion'] = data['solucion'].apply(limpiar_texto)
         data.to_csv('../ChatBot/data/files/texto_procesado.csv', index=False)
-        return True
+        return True,"Proceso de limpiado y guardado exitoso"
     except:
-        return False
+        return False,"Error: ha fallado la normalizacion de datos, verifique simbologia de celdas y palabras escritas correctamante"
     
 
 def reformular_data():
@@ -48,7 +50,7 @@ def reformular_data():
         xlsx = pd.read_excel('../ChatBot/data/data.xlsx')
         xlsx.to_csv('../ChatBot/data/data.csv', index=False)
     except:
-        return False
+        return False,"Error: hubo una falla en convertir el formato a csv (compatible con el modelo)"
     
     
     try:
@@ -75,7 +77,7 @@ def reformular_data():
         df['comentario'].fillna('vacio', inplace=True)
         df['solucion'].fillna('vacio')
         # Guarda el DataFrame modificado en un nuevo archivo CSV
-        df.dropna(inplace=True)
+        #df.dropna(inplace=True)
         
         id_mapping = {}
         # Recorre cada columna del DataFrame
@@ -95,10 +97,9 @@ def reformular_data():
             
         df.to_csv('../ChatBot/data/data.csv', index=False)
         print(df)
-
-        return True
+        return True,"Proceso de conversion de archivo exitoso",df
     except:
-        return False
+        return False,"Error: hay problema en el datos del archivo (tablas,columnas,simbologia, etc)","Informacion del XLSX defectuosa"
         
 
         

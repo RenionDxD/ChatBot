@@ -18,6 +18,6 @@ def crear_modelosCercania():
         nbrs = NearestNeighbors(n_neighbors=5, algorithm='auto').fit(X_train_tfidf)
         joblib.dump(nbrs, '../ChatBot/data/files/modelo_nbrs.pkl')
         
-        return True
+        return True,"El proceso de creacion de vectores de cercania ha sido exitoso"
     except:
-        return False
+        return False,"Error: El proceso de creacion de vectores de cercania ha fallado, verificar la columna detalle"

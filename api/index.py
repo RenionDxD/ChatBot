@@ -3,8 +3,12 @@ from controllers.controller import clientController
 
 blueprint = Blueprint('api', __name__)
 
-# Definir rutas y asociarlas a funciones del controlador
 
+@blueprint.route('/historial', methods=['POST'])
+def endpoint_use_history():
+    return clientController.history()
+
+# Definir rutas y asociarlas a funciones del controlador
 @blueprint.route('/preguntas', methods=['POST'])
 def endpoint_preguntas():
     return clientController.response()

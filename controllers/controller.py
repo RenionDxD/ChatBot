@@ -1,21 +1,32 @@
-from flask import request
+from flask import request, jsonify
 from controllers.services.clean_save import guardar_limpiar,reformular_data
 from controllers.services.make_model import crear_modelosCercania
 from controllers.services.recive_data import recivir_archivo, recivir_archivoTxt
 from controllers.services.predictor import verify_request
 from controllers.services.generateResponse import core_gpt
-import random
+import json
 
 class clientController:
+
+    def history():
+        use_history = FormRequest().get('pregunta')
+        with open('../ChatBot/data/history.json', 'r') as file:
+            config = json.load(file)
+        config['history'] = use_history
+        with open('../ChatBot/data/history.json', 'w') as file:
+            json.dump(config, file, indent=2)
+        config_inform = ["Se cambio la configuracion del historial"]
+        return config_inform
     
     def response():
-        redireccion = "usuario"
         pregunta = FormRequest().get('pregunta')
-        text_solucion,similares = verify_request(pregunta)
-        solucion = core_gpt(text_solucion,redireccion,pregunta)
-        respuesta_json = {
-            "solucion":solucion
-        }
+        if pregunta is None or pregunta.strip() == "":
+            # Si no se recibe la pregunta o está vacía, se devuelve un mensaje de error
+            return jsonify({"solucion": "La pregunta está vacía o no se ha proporcionado"})
+        text_solucion,context = verify_request(pregunta)
+        solucion = core_gpt(text_solucion,context,pregunta)
+        respuesta_json = {"solucion":solucion}
+        print(respuesta_json)
         return respuesta_json
     
     def dataRecive():
@@ -33,9 +44,11 @@ class clientController:
         
     
     def nuevoModelo():
-        confirmacion_reformular = reformular_data()
-        confirmacion_guardado = guardar_limpiar()
-        confirmacion_modelo = crear_modelosCercania()
+        resultado = ""
+        array_informe = []
+        confirmacion_reformular,informe,df = reformular_data()
+        confirmacion_guardado,informe2 = guardar_limpiar()
+        confirmacion_modelo,informe3 = crear_modelosCercania()
         
         if confirmacion_guardado and confirmacion_modelo and confirmacion_reformular:
             resultado = "Proceso exitoso: El modelo se ha creado con éxito."
@@ -45,8 +58,8 @@ class clientController:
             resultado = "Error: Hubo un problema al guardar y limpiar los datos. Verifica la ubicación del archivo o la estructura de este."
         else:
             resultado = "Error: El modelo no ha sido creado/actualizado, pero la limpieza de datos fue exitosa."
-
-        return resultado
+        array_informe=[informe,informe2,informe3,resultado,str(df)]
+        return array_informe
         
 
         
@@ -54,3 +67,4 @@ def FormRequest():
     # Define una función llamada FormRequest para obtener los datos del formulario en formato JSON
     request_form = request.get_json() # Obtener los datos del formulario en formato JSON
     return request_form
+
