@@ -1,27 +1,34 @@
 import openai
 from openai import OpenAI
-import time
+import json
 from controllers.services.check_history import rectificar_historial
 # pip install openai
 # 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
 
-def core_gpt(text_solucion,redireccion,pregunta,comentario):
+def core_gpt(prompt):
+    try:
+        with open('../ChatBot/config/history.json', 'r') as file:
+                config = json.load(file)
+        key = config['keyGPT']
+        client = OpenAI(api_key=key,)    
+        #reformula para entendimiento de usuario
+        response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": prompt},])
+        response = response.choices[0].message.content
+    except Exception as e:
+        print(str(e))
+        return f"Lamentamos los inconvenientes. ¡Por ahora, el chat no está disponible! ¡Pronto estaremos de vuelta!. :( Si este error persiste puedes comunicarte con nuestras operadoras"
+    return prompt#response
+
+def generate_prompt(text_solucion,redireccion,pregunta,comentario):
     context_pregunta = f"pregunta que genera respuesta: [{pregunta}]"
     summary = f'comentario: [{comentario}]'
     context = search_context(redireccion)
     solucion = f"[{text_solucion}]"
     prompt = f"{context}{solucion} : {context_pregunta} , {summary}"
-    #try:
-        #client = OpenAI(api_key="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",)    
-        #reformula para entendimiento de usuario
-        #response = client.chat.completions.create(
-        #model="gpt-3.5-turbo",
-        #messages=[{"role": "user", "content": prompt},])
-        #response = response.choices[0].message.content
-    #except Exception as e:
-        #print(str(e))
-        #return f"Lamentamos los inconvenientes. ¡Por ahora, el chat no está disponible! ¡Pronto estaremos de vuelta!. :( Si este error persiste puedes comunicarte con nuestras operadoras"
-    return prompt#response
+    return prompt
+
 
 
 

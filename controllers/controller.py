@@ -1,9 +1,9 @@
 from flask import request, jsonify
 from controllers.services.clean_save import guardar_limpiar,reformular_data
 from controllers.services.make_model import crear_modelos_cercania
-from controllers.services.recive_data import recivir_archivo, recivir_archivoTxt
+from controllers.services.recive_data import recivir_archivo, recivir_archivoTxt, recivir_archivoKey
 from controllers.services.predictor import verify_request
-from controllers.services.generateResponse import core_gpt
+from controllers.services.generateResponse import core_gpt, generate_prompt
 import json
 
 
@@ -43,7 +43,8 @@ class clientController:
             return jsonify({"solucion": "La pregunta está vacía o no se ha proporcionado"})
         
         text_solucion,comentario,context = verify_request(pregunta)
-        solucion = core_gpt(text_solucion,context,pregunta,comentario)
+        prompt = generate_prompt(text_solucion,context,pregunta,comentario)
+        solucion = core_gpt(prompt)
         respuesta_json = {"solucion":solucion}
 
         return respuesta_json
@@ -55,17 +56,20 @@ class clientController:
     def dataRecive():
         confirm_file1 = ""
         confirm_file2 = ""
+        confirm_file3 = ""
 
         # Obtener el archivo del formulario con el nombre 'archivo'
         file1 = request.files.get('archivo')
         file2 = request.files.get('txt')
+        file3 = request.files.get('key')
 
         # Llamar a la función 'recivir_archivo' para procesar el archivo
         confirm_file1 = recivir_archivo(file1)
         confirm_file2 = recivir_archivoTxt(file2)
+        confirm_file3 = recivir_archivoKey(file3)
 
         # Devolver la confirmación del archivo procesado
-        response = [confirm_file1,confirm_file2]
+        response = [confirm_file1,confirm_file2,confirm_file3]
         return response
         
     

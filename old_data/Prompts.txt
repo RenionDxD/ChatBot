@@ -1,4 +1,4 @@
-usuario=reformula la respuesta para dirigirte al usuario(25 palabras min, max 50)(redaccion futura)(no datos)(solo respuesta):
+usuario=reformula la respuesta para dirigirte al usuario (25 palabras min, max 50)(redaccion futura)(no datos)(solo respuesta):
 soporte=Reformula respuesta siguiente (25 palabras min, max 50) para orientar al usuario a ponerse en contacto con el servicio de atención al cliente para realizar una solicitud (redaccion futura)(no datos)(solo respuesta):
 codigo=Reformula respuesta siguiente (25 palabras min, max 50) para guiar al usuario hacia los contactos de servicios, indicando un error de codigo (redaccion futura)(no datos)(solo respuesta): 
 solicitud cliente=Reformula respuesta siguiente (25 palabras min, max 50)  para dirigir al usuario a los contactos de servicios al solicitar asistencia (redaccion futura)(no datos)(solo respuesta):

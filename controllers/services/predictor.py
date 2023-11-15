@@ -15,6 +15,7 @@ def verify_request(pregunta):
         solucion (str): La solución correspondiente a la pregunta más similar encontrada.
         similares (list): Una lista de preguntas similares excluyendo la pregunta principal.
         """
+    umbral = 0.99
     rute = rectificar_historial()
     data_search = pd.read_csv(f'{rute[0]}/data.csv')
 
@@ -26,15 +27,24 @@ def verify_request(pregunta):
     texto_vectorizado = tfidf_vectorizer.transform([pregunta])
     
     distances, indices = nbrs.kneighbors(texto_vectorizado)
+    print(distances.min())
+    
+      
     try:
         similar_questions = [data_search.iloc[i]['detalle'] for i in indices[0]]
         respuesta = similar_questions[0]
         fila = data_search[data_search['detalle'] == respuesta]
-        solucion = fila['solucion'].values[0]
-        comentario = fila['comentario'].values[0]
+       
+        if distances.min() > umbral:
+            solucion = "No entiendo lo que has dicho"
+            comentario = "porfavor de proporcionar mas informacion o mejorar la respuesta"
+        else:
+            solucion = fila['solucion'].values[0]
+            comentario = fila['comentario'].values[0]
+       
         context = search_context(fila.index[0])
     except Exception as e:
-        return "Error: Ha ocurrido un problema durante la verificación de la pregunta. si el error persiste comunícate con nuestras operadoras", "usuario"
+        return "Error: Ha ocurrido un problema durante la verificación de la pregunta. si el error persiste comunícate con nuestras operadoras", "error en alguna parte", "usuario"
     
     return solucion, comentario, context
 

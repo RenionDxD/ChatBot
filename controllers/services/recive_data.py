@@ -1,5 +1,8 @@
 import pandas as pd
-
+import io
+from controllers.services.generateResponse import core_gpt
+import json
+from openai import OpenAI
 
 def recivir_archivo(file):
     """
@@ -78,3 +81,36 @@ def validation_data():
 
     # Verificar si las columnas del XLSX son iguales a las del Prompt.txt
     return list(df.columns) == columnas_de_interes
+
+
+
+def recivir_archivoKey(file):
+
+    contenido_archivo = file.getvalue().decode('utf-8')
+   
+    # Buscar la línea que contiene la clave de GPT
+    lineas = contenido_archivo.split('\n')
+    
+    clave_gpt = lineas[0].strip()
+    
+    with open('../ChatBot/config/history.json', 'r') as file:
+            config = json.load(file)
+    config['keyGPT'] = clave_gpt
+    
+    with open('../ChatBot/config/history.json', 'w') as file:
+            json.dump(config, file, indent=2)
+
+    try:
+        with open('../ChatBot/config/history.json', 'r') as file:
+                config = json.load(file)
+        key = config['keyGPT']
+        client = OpenAI(api_key=key,)    
+        #reformula para entendimiento de usuario
+        response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=[{"role": "user", "content": "lore"},])
+        response = response.choices[0].message.content
+    except Exception as e:
+        return f"La llave contiene fallas, Error:[{e}]"
+  
+    return "La llave funciona perfectmante"
