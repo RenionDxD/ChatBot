@@ -1,0 +1,14 @@
+# Archivos de entorno virtual
+venv/
+
+# Archivos de caché y registros
+__pycache__/
+*.pyc
+*.pyo
+
+# Archivos de configuración
+*.pyc
+
+# Archivos generados por el sistema operativo
+.DS_Store
+Thumbs.db
