@@ -7,7 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 
-def crear_modelosCercania():
+def crear_modelos_cercania():
     try:
         df = pd.read_csv('../ChatBot/data/data.csv')
         tfidf_vectorizer = TfidfVectorizer(max_features=5000)

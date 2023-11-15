@@ -1,15 +1,16 @@
 import openai
 from openai import OpenAI
 import time
+from controllers.services.check_history import rectificar_historial
 # pip install openai
 # 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
 
-def core_gpt(text_solucion,redireccion,pregunta):
-    context_pregunta = "pregunta que genera respuesta: " + "["+pregunta+"]"
+def core_gpt(text_solucion,redireccion,pregunta,comentario):
+    context_pregunta = f"pregunta que genera respuesta: [{pregunta}]"
+    summary = f'comentario: [{comentario}]'
     context = search_context(redireccion)
-    solucion = "["+text_solucion+"]"
-    prompt = context + solucion+" : "+context_pregunta
-    time.sleep(2)
+    solucion = f"[{text_solucion}]"
+    prompt = f"{context}{solucion} : {context_pregunta} , {summary}"
     #try:
         #client = OpenAI(api_key="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",)    
         #reformula para entendimiento de usuario
@@ -17,16 +18,17 @@ def core_gpt(text_solucion,redireccion,pregunta):
         #model="gpt-3.5-turbo",
         #messages=[{"role": "user", "content": prompt},])
         #response = response.choices[0].message.content
-    #except:
-        #return "Lamentamos los inconvenientes. ¡Por ahora, el chat no está disponible! ¡Pronto estaremos de vuelta!."
+    #except Exception as e:
+        #print(str(e))
+        #return f"Lamentamos los inconvenientes. ¡Por ahora, el chat no está disponible! ¡Pronto estaremos de vuelta!. :( Si este error persiste puedes comunicarte con nuestras operadoras"
     return prompt#response
 
 
 
-
 def search_context(redireccion):
+    rute = rectificar_historial()
     variables_y_valores = []
-    with open('../ChatBot/data/Prompts.txt', 'r') as archivo:
+    with open(f'{rute[0]}/Prompts.txt', 'r') as archivo:
         lineas = archivo.readlines()
         for linea in lineas:
             variable, valor = linea.strip().split('=')

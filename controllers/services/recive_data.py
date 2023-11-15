@@ -11,16 +11,18 @@ def recivir_archivo(file):
     Returns:
         str: Mensaje de confirmación o error.
     """
-    if file:
-        if file.filename.endswith(('.xlsx')):
-            file.save('../ChatBot/data/data.xlsx')  # Guarda el archivo en una ubicación específica
-            respuesta = validation_data()
-            print(respuesta)
-            return "Archivo xlsx guardado con éxito"
-        else:
-            return "Error: El archivo que se proporciono no es el formato correcto (XLSX)"
-    else:
-        return "No se recibió ningún archivo xlsx"
+    if not file:
+        return "No se recibió ningún archivo XLSX"
+
+    if not file.filename.endswith(('.xlsx')):
+        return "Error: El archivo proporcionado no tiene el formato correcto (XLSX)"
+    
+    file.save('../ChatBot/data/data.xlsx')  # Guarda el archivo en una ubicación específica
+    respuesta = validation_data()
+    print(respuesta)
+
+    return "Archivo XLSX guardado con éxito"
+
     
 
 
@@ -55,13 +57,19 @@ def recivir_archivoTxt(file):
 
 
 def validation_data():   
+    """
+    Valida la consistencia de las columnas en el archivo XLSX con las especificadas en el archivo Prompts.txt.
+
+    Returns:
+        bool: True si las columnas son iguales, False en caso contrario.
+    """
     columnas_de_interes = []
 
     # Leer el archivo 'Prompts.txt' para obtener las columnas de interés
     with open('../ChatBot/data/Prompts.txt', 'r') as archivo:
         lineas = archivo.readlines()
         for linea in lineas:
-            variable, valor = linea.strip().split('=')
+            variable, _ = linea.strip().split('=')
             # Almacenar el nombre de la columna
             columnas_de_interes.append(variable.strip())
 
@@ -69,7 +77,4 @@ def validation_data():
     df = pd.read_excel('../ChatBot/data/data.xlsx')
 
     # Verificar si las columnas del XLSX son iguales a las del Prompt.txt
-    if list(df.columns) == columnas_de_interes:
-        return True
-    else:
-        return False
+    return list(df.columns) == columnas_de_interes

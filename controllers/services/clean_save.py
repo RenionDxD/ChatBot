@@ -5,38 +5,61 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from unidecode import unidecode
 import unicodedata
+from io import StringIO
 # instalar pip install openpyxl
 # pip install unidecode
 # pip install openpyxl
 
-nltk.download('stopwords')
-nltk.download('punkt')
+
+try:
+    nltk.download('stopwords')
+    nltk.download('punkt')
+except nltk.exceptions.HTTPError:
+    # Manejar el error en caso de problemas de descarga
+    print("No se ha podido descargar estos modulos")
+    pass
 
 
 def limpiar_texto(text):
-    stop = stopwords.words('spanish')
-    excluding = ['no', 'ni', 'pero', 'sino', 'sin', 'nada', 'nadie', 'ningún', 'ninguna', 'ningunos', 'ningunas']
-    stopwords_espanol = [word for word in stop if word not in excluding]
+    """
+    Limpia el texto eliminando stopwords y acentos.
+
+    Args:
+        text (str): El texto a limpiar.
+
+    Returns:
+        str: El texto limpio.
+    """
+    stop = set(stopwords.words('spanish')) - set(['no', 'ni', 'pero', 'sino', 'sin', 'nada', 'nadie', 'ningún', 'ninguna', 'ningunos', 'ningunas'])
+
     palabras_minusculas = nltk.word_tokenize(text.lower(),'spanish')  # Convertir a minúsculas
+   
     # Eliminar stopwords
-    palabras_filtradas = [palabra for palabra in palabras_minusculas if palabra not in stopwords_espanol]
+    palabras_filtradas = [palabra for palabra in palabras_minusculas if palabra not in stop]
+   
     # Reconstruir el texto limpio
-    texto_sin_espacio = ' '.join(palabras_filtradas)
-    palabra_con_acentos = texto_sin_espacio
-    texto_limpio = unidecode(palabra_con_acentos)
+    texto_limpio = unidecode(' '.join(palabras_filtradas))
+    
     return texto_limpio
 
 def guardar_limpiar():
+    """
+    Aplica la limpieza de texto a las columnas específicas de un DataFrame y guarda el resultado en un nuevo archivo CSV.
+
+    Returns:
+        tuple: Una tupla con un booleano indicando si el proceso fue exitoso y un mensaje informativo.
+    """
     try:
         data = pd.read_csv('../ChatBot/data/data.csv')
-        data['modulo'] = data['modulo'].apply(limpiar_texto)
-        data['detalle'] = data['detalle'].apply(limpiar_texto)
-        data['comentario'] = data['comentario'].apply(limpiar_texto)
-        data['solucion'] = data['solucion'].apply(limpiar_texto)
+        columnas_a_limpiar = ['modulo', 'detalle', 'comentario', 'solucion']
+        
+        for columna in columnas_a_limpiar:
+            data[columna] = data[columna].apply(limpiar_texto)
+
         data.to_csv('../ChatBot/data/files/texto_procesado.csv', index=False)
         return True,"Proceso de limpiado y guardado exitoso"
-    except:
-        return False,"Error: ha fallado la normalizacion de datos, verifique simbologia de celdas y palabras escritas correctamante"
+    except Exception as e:
+        return False, f"Error: Ha fallado la normalización de datos. Verifique simbología de celdas y palabras escritas correctamente. Detalle: {str(e)}"
     
 
 def reformular_data():
@@ -49,8 +72,8 @@ def reformular_data():
     try:
         xlsx = pd.read_excel('../ChatBot/data/data.xlsx')
         xlsx.to_csv('../ChatBot/data/data.csv', index=False)
-    except:
-        return False,"Error: hubo una falla en convertir el formato a csv (compatible con el modelo)"
+    except Exception as e:
+        return False, f"Error: Hubo una falla en convertir el formato a CSV (compatible con el modelo). Detalle: {str(e)}"
     
     
     try:
@@ -61,7 +84,7 @@ def reformular_data():
         df = df.loc[:, ~df.columns.str.contains('^Unnamed')]
         
         #aplicar minusculas
-        df = df.applymap(lambda x: x.lower() if isinstance(x, str) else x)
+        df = df.apply(lambda x: x.apply(lambda y: y.lower() if isinstance(y, str) else y))
         df.columns = [unicodedata.normalize('NFD', col).encode('ascii', 'ignore').decode('utf-8').lower() for col in df.columns]
         
         df = df.replace(r'^\s*$', 'vacio', regex=True) 
@@ -96,10 +119,15 @@ def reformular_data():
             df[column + '_id'] = df[column].map(id_mapping)
             
         df.to_csv('../ChatBot/data/data.csv', index=False)
-        print(df)
-        return True,"Proceso de conversion de archivo exitoso",df
-    except:
-        return False,"Error: hay problema en el datos del archivo (tablas,columnas,simbologia, etc)","Informacion del XLSX defectuosa"
+        info_buffer = StringIO()
+        df.info(buf=info_buffer)
+
+        # Recupera la información como una cadena
+        df_info = info_buffer.getvalue()
+        #print(df_info)
+        return True,"Proceso de conversion de archivo exitoso",str(df_info)
+    except Exception as e:
+        return False, f"Error: Hay un problema en los datos del archivo (tablas, columnas, simbología, etc). Detalle: {str(e)}", "Información del XLSX defectuosa"
         
 
         
