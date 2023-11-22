@@ -3,7 +3,7 @@ from openai import OpenAI
 import json
 from controllers.services.check_history import rectificar_historial
 # pip install openai
-# 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
+# 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
 
 def core_gpt(prompt):
     try:
@@ -19,7 +19,7 @@ def core_gpt(prompt):
     except Exception as e:
         print(str(e))
         return f"Lamentamos los inconvenientes. ¡Por ahora, el chat no está disponible! ¡Pronto estaremos de vuelta!. :( Si este error persiste puedes comunicarte con nuestras operadoras"
-    return prompt#response
+    return response
 
 def generate_prompt(text_solucion,redireccion,pregunta,comentario):
     context_pregunta = f"pregunta que genera respuesta: [{pregunta}]"

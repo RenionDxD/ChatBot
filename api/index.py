@@ -1,8 +1,11 @@
-from flask import Blueprint
+from flask import Blueprint,jsonify
 from controllers.controller import clientController
 
 blueprint = Blueprint('api', __name__)
 
+@blueprint.route('/Online', methods=['GET'])
+def check_status():
+    return jsonify({'status': 'online'})
 
 @blueprint.route('/historial', methods=['POST'])
 def endpoint_use_history():
