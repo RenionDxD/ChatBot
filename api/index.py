@@ -7,6 +7,11 @@ blueprint = Blueprint('api', __name__)
 def check_status():
     return jsonify({'status': 'online'})
 
+
+@blueprint.route('/send_review', methods=['POST'])
+def endpoint_check_review():
+    return clientController.review()
+
 @blueprint.route('/historial', methods=['POST'])
 def endpoint_use_history():
     return clientController.history()

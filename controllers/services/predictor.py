@@ -1,6 +1,8 @@
 import pandas as pd
 import joblib
 from controllers.services.check_history import rectificar_historial
+from controllers.services.save_new_questions import save_new_questions
+
 
 
 # Función para verificar una pregunta y encontrar soluciones similares
@@ -38,15 +40,17 @@ def verify_request(pregunta):
         if distances.min() > umbral:
             solucion = "No entiendo lo que has dicho"
             comentario = "porfavor de proporcionar mas informacion o mejorar la respuesta"
+            save_new_questions(pregunta)
+            color_question = False
         else:
             solucion = fila['solucion'].values[0]
             comentario = fila['comentario'].values[0]
+            color_question = True
        
         context = search_context(fila.index[0])
     except Exception as e:
-        return "Error: Ha ocurrido un problema durante la verificación de la pregunta. si el error persiste comunícate con nuestras operadoras", "error en alguna parte", "usuario"
-    
-    return solucion, comentario, context
+        return "Error: Ha ocurrido un problema durante la verificación de la pregunta. si el error persiste comunícate con nuestras operadoras", "error en alguna parte", "usuario",False
+    return solucion, comentario, context, similar_questions, color_question
 
 
 def search_context(index):

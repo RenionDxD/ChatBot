@@ -67,20 +67,22 @@ def validation_data():
         bool: True si las columnas son iguales, False en caso contrario.
     """
     columnas_de_interes = []
+    try:
+        # Leer el archivo 'Prompts.txt' para obtener las columnas de interés
+        with open('../ChatBot/data/Prompts.txt', 'r') as archivo:
+            lineas = archivo.readlines()
+            for linea in lineas:
+                variable, _ = linea.strip().split('=')
+                # Almacenar el nombre de la columna
+                columnas_de_interes.append(variable.strip())
 
-    # Leer el archivo 'Prompts.txt' para obtener las columnas de interés
-    with open('../ChatBot/data/Prompts.txt', 'r') as archivo:
-        lineas = archivo.readlines()
-        for linea in lineas:
-            variable, _ = linea.strip().split('=')
-            # Almacenar el nombre de la columna
-            columnas_de_interes.append(variable.strip())
+        # Leer el archivo XLSX
+        df = pd.read_excel('../ChatBot/data/data.xlsx')
 
-    # Leer el archivo XLSX
-    df = pd.read_excel('../ChatBot/data/data.xlsx')
-
-    # Verificar si las columnas del XLSX son iguales a las del Prompt.txt
-    return list(df.columns) == columnas_de_interes
+        # Verificar si las columnas del XLSX son iguales a las del Prompt.txt
+        return list(df.columns) == columnas_de_interes
+    except:
+        return "Error: columnas con variables prompt no coinciden"
 
 
 

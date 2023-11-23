@@ -32,21 +32,29 @@ class clientController:
         return config_info
     
 
-
+    def review():
+        review = FormRequest().get('review')
+        pregunta = FormRequest().get('respuesta')
+        print(review,pregunta)
+        return "",204
 
     
     def response():
         pregunta = FormRequest().get('pregunta')
 
         if pregunta is None or pregunta.strip() == "":
+            respuesta_json = {"solucion":"La pregunta está vacía o no se ha proporcionado",
+                              "similares":"",
+                              "color_solucion":False}
             # Si no se recibe la pregunta o está vacía, se devuelve un mensaje de error
-            return jsonify({"solucion": "La pregunta está vacía o no se ha proporcionado"})
+            return respuesta_json
         
-        text_solucion,comentario,context = verify_request(pregunta)
+        text_solucion,comentario,context,similar_questions,color_question = verify_request(pregunta)
         prompt = generate_prompt(text_solucion,context,pregunta,comentario)
         solucion = core_gpt(prompt)
-        respuesta_json = {"solucion":solucion}
-
+        respuesta_json = {"solucion":solucion,
+                          "similares":similar_questions,
+                          "color_solucion":color_question}
         return respuesta_json
     
 
