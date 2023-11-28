@@ -22,7 +22,6 @@ def recivir_archivo(file):
     
     file.save('../ChatBot/data/data.xlsx')  # Guarda el archivo en una ubicación específica
     respuesta = validation_data()
-    print(respuesta)
 
     return "Archivo XLSX guardado con éxito"
 

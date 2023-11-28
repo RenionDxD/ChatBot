@@ -1,15 +1,21 @@
-from flask import request, jsonify
+from flask import request, jsonify,send_file
 from controllers.services.clean_save import guardar_limpiar,reformular_data
 from controllers.services.make_model import crear_modelos_cercania
 from controllers.services.recive_data import recivir_archivo, recivir_archivoTxt, recivir_archivoKey
 from controllers.services.predictor import verify_request
 from controllers.services.generateResponse import core_gpt, generate_prompt
+from controllers.services.results_questions import save_review
 import json
+from openpyxl import Workbook
+import pandas as pd
 
 
 
 
 class clientController:
+    
+    
+    
 
     def history():
         data = request.get_json()
@@ -31,11 +37,25 @@ class clientController:
 
         return config_info
     
+    def send_files():
+        nofile = FormRequest().get('Nofile')
+        
+        if nofile == 1:
+            file = "../ChatBot/data/download_files/data_new.xlsx"
+            df = pd.read_csv('../ChatBot/data/data.csv')
+            df.to_excel(file, index=False)
+        elif nofile == 2:
+            file = '../ChatBot/data/download_files/preguntas_nuevas.xlsx'
+            
+        return send_file(file, as_attachment=True)
+    
 
     def review():
+        pregunta = FormRequest().get('pregunta')
+        findQuestion = verify_request(pregunta)
         review = FormRequest().get('review')
         pregunta = FormRequest().get('respuesta')
-        print(review,pregunta)
+        save_review(review,pregunta,findQuestion[3][0])
         return "",204
 
     
@@ -45,16 +65,18 @@ class clientController:
         if pregunta is None or pregunta.strip() == "":
             respuesta_json = {"solucion":"La pregunta está vacía o no se ha proporcionado",
                               "similares":"",
-                              "color_solucion":False}
+                              "find":False,
+                              "pregunta":""}
             # Si no se recibe la pregunta o está vacía, se devuelve un mensaje de error
             return respuesta_json
         
-        text_solucion,comentario,context,similar_questions,color_question = verify_request(pregunta)
+        text_solucion,comentario,context,similar_questions,find = verify_request(pregunta)
         prompt = generate_prompt(text_solucion,context,pregunta,comentario)
         solucion = core_gpt(prompt)
         respuesta_json = {"solucion":solucion,
                           "similares":similar_questions,
-                          "color_solucion":color_question}
+                          "find":find,
+                          "pregunta":pregunta}
         return respuesta_json
     
 

@@ -1,7 +1,7 @@
 import pandas as pd
 import joblib
 from controllers.services.check_history import rectificar_historial
-from controllers.services.save_new_questions import save_new_questions
+from controllers.services.results_questions import save_new_questions
 
 
 
@@ -41,16 +41,16 @@ def verify_request(pregunta):
             solucion = "No entiendo lo que has dicho"
             comentario = "porfavor de proporcionar mas informacion o mejorar la respuesta"
             save_new_questions(pregunta)
-            color_question = False
+            find = False
         else:
             solucion = fila['solucion'].values[0]
             comentario = fila['comentario'].values[0]
-            color_question = True
+            find = True
        
         context = search_context(fila.index[0])
     except Exception as e:
-        return "Error: Ha ocurrido un problema durante la verificación de la pregunta. si el error persiste comunícate con nuestras operadoras", "error en alguna parte", "usuario",False
-    return solucion, comentario, context, similar_questions, color_question
+        return "Error: Ha ocurrido un problema durante la verificación de la pregunta. si el error persiste comunícate con nuestras operadoras", "error en alguna parte", "usuario","",False
+    return solucion, comentario, context, similar_questions, find
 
 
 def search_context(index):
